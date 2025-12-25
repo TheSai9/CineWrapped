@@ -25,6 +25,7 @@ export interface ProcessedStats {
   averageRating: number;
   ratingDistribution: { rating: string; count: number }[];
   monthlyDistribution: { month: string; count: number }[];
+  dailyActivity: { date: string; count: number }[];
   rewatchCount: number;
   topRatedFilms: RatingEntry[]; // Top 5
   longestStreak: number;

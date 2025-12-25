@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ProcessedStats, PersonaResult } from '../types';
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, Cell, AreaChart, Area } from 'recharts';
 import { generatePersona } from '../services/geminiService';
-import { Play, Pause, ChevronRight, ChevronLeft, Share2, RotateCcw } from 'lucide-react';
+import { Play, Pause, ChevronRight, ChevronLeft, Share2, RotateCcw, Flame, Calendar, Trophy } from 'lucide-react';
+import CalendarHeatmap from './CalendarHeatmap';
 
 interface WrappedSlidesProps {
   stats: ProcessedStats;
@@ -86,34 +87,65 @@ const WrappedSlides: React.FC<WrappedSlidesProps> = ({ stats, onReset }) => {
   const SlideRhythm = () => (
     <div className="flex flex-col items-center justify-center h-full p-6 w-full max-w-5xl mx-auto">
         <h3 className="text-3xl font-bold text-white mb-2 cinematic-text">Your Cinematic Rhythm</h3>
-        <p className="text-slate-400 mb-8">Busiest month: <span className="text-orange-400 font-bold">{stats.topMonth}</span></p>
+        <p className="text-slate-400 mb-6">Every day you watched a film is a pixel in your story.</p>
 
-        <div className="w-full h-64 md:h-96">
+        {/* Heatmap Section */}
+        <div className="w-full bg-slate-900/40 p-4 rounded-xl border border-slate-800 mb-8">
+             <CalendarHeatmap data={stats.dailyActivity} year={stats.year} />
+        </div>
+        
+        {/* Stats Grid */}
+        <div className="grid grid-cols-3 gap-3 md:gap-6 w-full mb-8">
+             <motion.div 
+                initial={{ scale: 0.8, opacity: 0 }}
+                whileInView={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="bg-slate-800/50 p-4 rounded-xl flex flex-col items-center text-center"
+             >
+                <Flame className="text-orange-500 mb-2" size={24} />
+                <div className="text-2xl md:text-3xl font-bold text-white">{stats.longestStreak}</div>
+                <div className="text-xs md:text-sm text-slate-400 uppercase tracking-wide">Longest Streak</div>
+             </motion.div>
+
+             <motion.div 
+                initial={{ scale: 0.8, opacity: 0 }}
+                whileInView={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="bg-slate-800/50 p-4 rounded-xl flex flex-col items-center text-center"
+             >
+                <Trophy className="text-yellow-500 mb-2" size={24} />
+                <div className="text-2xl md:text-3xl font-bold text-white">{stats.busiestDay.count}</div>
+                <div className="text-xs md:text-sm text-slate-400 uppercase tracking-wide">Single Day Record</div>
+             </motion.div>
+
+             <motion.div 
+                initial={{ scale: 0.8, opacity: 0 }}
+                whileInView={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.4 }}
+                className="bg-slate-800/50 p-4 rounded-xl flex flex-col items-center text-center"
+             >
+                <Calendar className="text-green-500 mb-2" size={24} />
+                <div className="text-xl md:text-2xl font-bold text-white leading-8 pt-1">{stats.topDayOfWeek.slice(0, 3)}</div>
+                <div className="text-xs md:text-sm text-slate-400 uppercase tracking-wide">Fav Day</div>
+             </motion.div>
+        </div>
+
+        {/* Monthly Chart (Compact) */}
+        <div className="w-full h-32 md:h-40">
             <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={stats.monthlyDistribution}>
-                    <XAxis dataKey="month" stroke="#94a3b8" fontSize={12} tickLine={false} axisLine={false} />
                     <Tooltip 
-                        contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff' }}
+                        contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '8px', color: '#fff', fontSize: '12px' }}
                         cursor={{fill: 'transparent'}}
                     />
-                    <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+                    <Bar dataKey="count" radius={[2, 2, 0, 0]}>
                         {stats.monthlyDistribution.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.month === stats.topMonth ? '#f97316' : '#475569'} />
+                            <Cell key={`cell-${index}`} fill={entry.month === stats.topMonth ? '#f97316' : '#334155'} />
                         ))}
                     </Bar>
                 </BarChart>
             </ResponsiveContainer>
-        </div>
-        
-        <div className="grid grid-cols-2 gap-4 mt-8 w-full max-w-2xl">
-            <div className="bg-slate-800/50 p-4 rounded-xl text-center">
-                <div className="text-sm text-slate-400">Longest Streak</div>
-                <div className="text-2xl font-bold text-white">{stats.longestStreak} Days</div>
-            </div>
-            <div className="bg-slate-800/50 p-4 rounded-xl text-center">
-                <div className="text-sm text-slate-400">Favorite Day</div>
-                <div className="text-2xl font-bold text-white">{stats.topDayOfWeek}</div>
-            </div>
+            <div className="text-center text-xs text-slate-500 mt-2">Monthly Volume</div>
         </div>
     </div>
   );

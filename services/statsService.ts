@@ -44,6 +44,9 @@ export const processData = (diary: DiaryEntry[], ratings: RatingEntry[]): Proces
   const busyDayEntry = Object.entries(dateCounts).sort((a, b) => b[1] - a[1])[0];
   const busiestDay = { date: busyDayEntry?.[0] || "", count: busyDayEntry?.[1] || 0 };
 
+  // Prepare Daily Activity for Heatmap
+  const dailyActivity = Object.entries(dateCounts).map(([date, count]) => ({ date, count }));
+
   // 3. Streak Calculation
   const dates = Object.keys(dateCounts).sort();
   let maxStreak = 0;
@@ -68,9 +71,6 @@ export const processData = (diary: DiaryEntry[], ratings: RatingEntry[]): Proces
   });
 
   // 4. Ratings Analysis
-  // Filter ratings to only include those made in the target year (approximate via matching diary entries names/dates is hard without ID, 
-  // so we will just use the ratings provided if they match films watched this year or if the rating date is this year)
-  // Let's filter ratings.csv by the target year as well.
   const yearRatings = ratings.filter(r => r.Date.startsWith(targetYear.toString()));
   
   let ratingSum = 0;
@@ -93,7 +93,6 @@ export const processData = (diary: DiaryEntry[], ratings: RatingEntry[]): Proces
   const rewatchCount = yearDiary.filter(d => d.Rewatch === "Yes").length;
 
   // 6. Top Rated
-  // Sort by rating desc
   const topRatedFilms = [...yearRatings]
     .sort((a, b) => parseFloat(b.Rating) - parseFloat(a.Rating))
     .slice(0, 5);
@@ -107,6 +106,7 @@ export const processData = (diary: DiaryEntry[], ratings: RatingEntry[]): Proces
     averageRating,
     ratingDistribution,
     monthlyDistribution,
+    dailyActivity,
     rewatchCount,
     topRatedFilms,
     longestStreak: maxStreak,
