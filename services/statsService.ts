@@ -4,7 +4,6 @@ export const processData = (diary: DiaryEntry[], ratings: RatingEntry[]): Proces
   if (diary.length === 0) return null;
 
   // Filter for the most recent complete year present in the data or the current year
-  // For simplicity, we'll take the year of the most recent entry
   const sortedDiary = [...diary].sort((a, b) => new Date(b["Watched Date"]).getTime() - new Date(a["Watched Date"]).getTime());
   const latestDate = new Date(sortedDiary[0]["Watched Date"]);
   const targetYear = latestDate.getFullYear();
@@ -22,9 +21,12 @@ export const processData = (diary: DiaryEntry[], ratings: RatingEntry[]): Proces
   const monthCounts: Record<string, number> = {};
   const dayCounts: Record<string, number> = {};
   const dateCounts: Record<string, number> = {};
+  const decadeCounts: Record<string, number> = {};
 
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  // Initialize day counts to 0 to ensure chart order
+  days.forEach(d => dayCounts[d] = 0);
 
   yearDiary.forEach(entry => {
     const date = new Date(entry["Watched Date"]);
@@ -35,9 +37,23 @@ export const processData = (diary: DiaryEntry[], ratings: RatingEntry[]): Proces
     monthCounts[month] = (monthCounts[month] || 0) + 1;
     dayCounts[day] = (dayCounts[day] || 0) + 1;
     dateCounts[dateStr] = (dateCounts[dateStr] || 0) + 1;
+
+    // Decade Calc
+    const releaseYear = parseInt(entry.Year);
+    if (!isNaN(releaseYear)) {
+        const decade = Math.floor(releaseYear / 10) * 10;
+        const decadeStr = `${decade}s`;
+        decadeCounts[decadeStr] = (decadeCounts[decadeStr] || 0) + 1;
+    }
   });
 
   const monthlyDistribution = months.map(m => ({ month: m, count: monthCounts[m] || 0 }));
+  const dayOfWeekDistribution = days.map(d => ({ day: d, count: dayCounts[d] || 0 }));
+  
+  const decadeDistribution = Object.entries(decadeCounts)
+    .sort((a, b) => parseInt(a[0]) - parseInt(b[0]))
+    .map(([decade, count]) => ({ decade, count }));
+
   const topMonth = Object.entries(monthCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || "None";
   const topDayOfWeek = Object.entries(dayCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || "None";
   
@@ -107,6 +123,8 @@ export const processData = (diary: DiaryEntry[], ratings: RatingEntry[]): Proces
     ratingDistribution,
     monthlyDistribution,
     dailyActivity,
+    dayOfWeekDistribution,
+    decadeDistribution,
     rewatchCount,
     topRatedFilms,
     longestStreak: maxStreak,
