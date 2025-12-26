@@ -1,14 +1,23 @@
+
 import { GoogleGenAI } from "@google/genai";
 import { ProcessedStats, PersonaResult } from '../types';
 
 // Fallback if API key is not present
 const FALLBACK_PERSONA: PersonaResult = {
-  title: " The Dedicated Cinephile",
+  title: "The Dedicated Cinephile",
   description: "You watched a ton of movies this year. Your stats show a consistent love for the medium, exploring various genres and eras. Without an AI connection, we can't roast you specifically, but know that you have excellent taste!"
 };
 
 export const generatePersona = async (stats: ProcessedStats): Promise<PersonaResult> => {
-  const apiKey = process.env.API_KEY;
+  // Safely check for process.env to avoid crashing in browser-only environments
+  let apiKey: string | undefined;
+  try {
+    if (typeof process !== 'undefined' && process.env) {
+      apiKey = process.env.API_KEY;
+    }
+  } catch (e) {
+    // Ignore reference errors
+  }
   
   if (!apiKey) {
     console.warn("API Key not found, using fallback persona.");
