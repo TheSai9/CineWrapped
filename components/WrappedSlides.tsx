@@ -1,10 +1,11 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ProcessedStats, PersonaResult } from '../types';
 import { BarChart, Bar, XAxis, ResponsiveContainer, Tooltip, Cell, LabelList } from 'recharts';
 import { generatePersona } from '../services/geminiService';
 import { getMoviePoster } from '../services/tmdbService';
-import { ChevronRight, ChevronLeft, RotateCcw, Flame, Trophy, Clock, Star, Film } from 'lucide-react';
+import { ChevronRight, ChevronLeft, RotateCcw, Flame, Trophy, Clock, Star, Film, Users, Clapperboard, Hash } from 'lucide-react';
 import CalendarHeatmap from './CalendarHeatmap';
 
 interface WrappedSlidesProps {
@@ -31,7 +32,7 @@ const WrappedSlides: React.FC<WrappedSlidesProps> = ({ stats, onReset }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [persona, setPersona] = useState<PersonaResult | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const totalSlides = 6;
+  const totalSlides = 7; // Increased from 6
 
   useEffect(() => {
     generatePersona(stats).then(setPersona);
@@ -330,7 +331,113 @@ const WrappedSlides: React.FC<WrappedSlidesProps> = ({ stats, onReset }) => {
     </div>
   )};
 
-  // --- SLIDE 6: IDENTITY (Yellow Background) ---
+  // --- SLIDE 6: CAST & CREW (Bauhaus Color Mix) ---
+  const SlideCastCrew = () => (
+    <div className="flex flex-col min-h-full py-12 px-4 md:px-8 bg-bauhaus-bg text-bauhaus-black">
+      <div className="max-w-6xl mx-auto w-full h-full flex flex-col">
+        <h3 className="text-4xl md:text-6xl font-black uppercase mb-8 md:mb-12 border-b-4 border-black pb-4">
+            The <span className="text-bauhaus-blue">A-List</span>
+        </h3>
+
+        {!stats.topActors ? (
+           <div className="flex-1 flex items-center justify-center border-4 border-black border-dashed opacity-50">
+             <div className="text-xl font-bold uppercase">Data Unavailable</div>
+           </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 flex-1">
+            
+            {/* Top Actors */}
+            <div className="flex flex-col">
+                <div className="flex items-center gap-3 mb-6">
+                    <Users className="w-8 h-8 md:w-10 md:h-10 text-bauhaus-red" />
+                    <h4 className="text-2xl md:text-4xl font-black uppercase">Most Watched Stars</h4>
+                </div>
+                <div className="space-y-4">
+                    {stats.topActors?.map((actor, idx) => (
+                        <motion.div 
+                            key={actor.name}
+                            initial={{ x: -20, opacity: 0 }}
+                            whileInView={{ x: 0, opacity: 1 }}
+                            transition={{ delay: idx * 0.1 }}
+                            className="bg-white border-4 border-black p-4 flex items-center gap-4 shadow-hard-sm hover:shadow-hard-md hover:-translate-y-1 transition-all"
+                        >
+                            <div className="relative w-16 h-16 md:w-20 md:h-20 shrink-0 border-2 border-black overflow-hidden bg-gray-200">
+                                {actor.image ? (
+                                    <img src={actor.image} alt={actor.name} className="w-full h-full object-cover" />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center text-bauhaus-red font-black text-2xl">{idx + 1}</div>
+                                )}
+                            </div>
+                            <div className="flex-1">
+                                <div className="text-lg md:text-2xl font-black uppercase leading-none mb-1">{actor.name}</div>
+                                <div className="text-sm font-bold bg-bauhaus-yellow inline-block px-2 border border-black">
+                                    {actor.count} Films
+                                </div>
+                            </div>
+                            <div className="text-4xl font-black text-gray-200">#{idx + 1}</div>
+                        </motion.div>
+                    ))}
+                </div>
+            </div>
+
+             {/* Directors & Genres */}
+            <div className="flex flex-col gap-8">
+                {/* Directors */}
+                <div>
+                     <div className="flex items-center gap-3 mb-6">
+                        <Clapperboard className="w-8 h-8 md:w-10 md:h-10 text-bauhaus-blue" />
+                        <h4 className="text-2xl md:text-3xl font-black uppercase">Top Directors</h4>
+                    </div>
+                    <div className="grid grid-cols-1 gap-3">
+                         {stats.topDirectors?.slice(0, 3).map((director, idx) => (
+                             <motion.div
+                                key={director.name}
+                                initial={{ x: 20, opacity: 0 }}
+                                whileInView={{ x: 0, opacity: 1 }}
+                                transition={{ delay: idx * 0.1 + 0.2 }}
+                                className="bg-bauhaus-black text-white p-4 border-2 border-transparent flex justify-between items-center"
+                             >
+                                <span className="font-bold text-lg">{director.name}</span>
+                                <span className="font-black text-bauhaus-yellow">{director.count}</span>
+                             </motion.div>
+                         ))}
+                    </div>
+                </div>
+
+                {/* Genres */}
+                <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-6">
+                        <Hash className="w-8 h-8 md:w-10 md:h-10 text-bauhaus-yellow fill-black" />
+                        <h4 className="text-2xl md:text-3xl font-black uppercase">Genre Mix</h4>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                        {stats.topGenres?.map((genre, idx) => (
+                             <motion.div
+                                key={genre.name}
+                                initial={{ scale: 0.8, opacity: 0 }}
+                                whileInView={{ scale: 1, opacity: 1 }}
+                                transition={{ delay: idx * 0.05 }}
+                                className={`
+                                    border-2 border-black px-3 py-1 font-bold uppercase text-sm md:text-base
+                                    ${idx === 0 ? 'bg-bauhaus-red text-white text-xl p-4 shadow-hard-sm' : ''}
+                                    ${idx === 1 ? 'bg-bauhaus-blue text-white text-lg p-3' : ''}
+                                    ${idx === 2 ? 'bg-bauhaus-yellow text-black' : ''}
+                                    ${idx > 2 ? 'bg-white text-black' : ''}
+                                `}
+                             >
+                                {genre.name} <span className="opacity-70 text-xs ml-1">({genre.count})</span>
+                             </motion.div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  // --- SLIDE 7: IDENTITY (Yellow Background) ---
   const SlideIdentity = () => (
     <div className="flex flex-col items-center justify-center min-h-full py-12 px-4 md:px-6 bg-bauhaus-yellow text-bauhaus-black relative overflow-hidden">
         {/* Poster Design Layout */}
@@ -382,7 +489,7 @@ const WrappedSlides: React.FC<WrappedSlidesProps> = ({ stats, onReset }) => {
     </div>
   );
 
-  const slides = [SlideIntro, SlideVolume, SlideRhythm, SlideRatings, SlideFavorites, SlideIdentity];
+  const slides = [SlideIntro, SlideVolume, SlideRhythm, SlideRatings, SlideFavorites, SlideCastCrew, SlideIdentity];
   const CurrentSlideComponent = slides[currentSlide];
 
   return (

@@ -1,3 +1,4 @@
+
 export interface DiaryEntry {
   Date: string; // "YYYY-MM-DD"
   Name: string;
@@ -37,6 +38,11 @@ export interface ProcessedStats {
   uniqueFilmsCount: number;
   moviesPerWeekAvg: number;
   year: number; // The analysis year
+  
+  // New Enriched Data
+  topActors?: { name: string; count: number; image?: string }[];
+  topDirectors?: { name: string; count: number; image?: string }[];
+  topGenres?: { name: string; count: number }[];
 }
 
 export interface PersonaResult {
