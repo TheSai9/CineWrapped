@@ -50,7 +50,7 @@ const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({ data, year }) => {
             style={{ 
                 gridTemplateRows: 'repeat(7, 1fr)', 
                 gridAutoFlow: 'column',
-                height: '120px'
+                height: '100px'
             }}
         >
             {days.map((day, idx) => (
@@ -59,18 +59,26 @@ const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({ data, year }) => {
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
                     viewport={{ once: true }}
-                    transition={{ delay: idx * 0.001 }}
-                    className={`w-3 h-3 ${day.count >= 0 ? 'border-[0.5px] border-bauhaus-bg' : ''}`}
+                    transition={{ delay: idx * 0.0005 }}
+                    className={`w-3 h-3 ${day.count >= 0 ? 'hover:ring-2 hover:ring-black relative z-10' : ''}`}
                     style={{ backgroundColor: getColor(day.count) }}
                     title={day.count >= 0 ? `${day.dateStr}: ${day.count} films` : ''}
                 />
             ))}
         </div>
-        <div className="flex justify-between text-xs font-bold uppercase tracking-widest mt-2 border-t-2 border-bauhaus-black pt-1">
-            <span>Jan</span>
+        {/* Month Labels aligned to grid estimation */}
+        <div className="flex text-[10px] font-black uppercase tracking-widest mt-2 border-t-2 border-bauhaus-black pt-1 gap-12 text-gray-400">
+            <span className="text-black">Jan</span>
+            <span>Feb</span>
+            <span>Mar</span>
             <span>Apr</span>
+            <span>May</span>
+            <span>Jun</span>
             <span>Jul</span>
+            <span>Aug</span>
+            <span>Sep</span>
             <span>Oct</span>
+            <span>Nov</span>
             <span>Dec</span>
         </div>
       </div>
