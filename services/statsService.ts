@@ -1,11 +1,22 @@
+
 import { DiaryEntry, RatingEntry, ProcessedStats } from '../types';
 
 export const processData = (diary: DiaryEntry[], ratings: RatingEntry[]): ProcessedStats | null => {
   if (diary.length === 0) return null;
 
   // Filter for the most recent complete year present in the data or the current year
-  const sortedDiary = [...diary].sort((a, b) => new Date(b["Watched Date"]).getTime() - new Date(a["Watched Date"]).getTime());
-  const latestDate = new Date(sortedDiary[0]["Watched Date"]);
+  // Robust date parsing needed here
+  const sortedDiary = [...diary].sort((a, b) => {
+      const dateA = new Date(a["Watched Date"]);
+      const dateB = new Date(b["Watched Date"]);
+      return (isNaN(dateB.getTime()) ? 0 : dateB.getTime()) - (isNaN(dateA.getTime()) ? 0 : dateA.getTime());
+  });
+  
+  // Find first valid date
+  const latestEntry = sortedDiary.find(d => !isNaN(new Date(d["Watched Date"]).getTime()));
+  if (!latestEntry) return null;
+
+  const latestDate = new Date(latestEntry["Watched Date"]);
   const targetYear = latestDate.getFullYear();
 
   const yearDiary = sortedDiary.filter(d => d["Watched Date"].startsWith(targetYear.toString()));
@@ -30,6 +41,8 @@ export const processData = (diary: DiaryEntry[], ratings: RatingEntry[]): Proces
 
   yearDiary.forEach(entry => {
     const date = new Date(entry["Watched Date"]);
+    if (isNaN(date.getTime())) return;
+
     const month = months[date.getMonth()];
     const day = days[date.getDay()];
     const dateStr = entry["Watched Date"];
@@ -39,11 +52,18 @@ export const processData = (diary: DiaryEntry[], ratings: RatingEntry[]): Proces
     dateCounts[dateStr] = (dateCounts[dateStr] || 0) + 1;
 
     // Decade Calc
-    // Validate Year first
-    const yearStr = entry.Year ? entry.Year.trim() : "";
+    // Try to find the year property case-insensitively if exact match fails
+    let yearStr = entry.Year;
+    if (!yearStr) {
+        const key = Object.keys(entry).find(k => k.toLowerCase() === 'year');
+        if (key) yearStr = (entry as any)[key];
+    }
+    
+    yearStr = yearStr ? yearStr.trim() : "";
+    
     if (yearStr && !isNaN(parseInt(yearStr))) {
         const releaseYear = parseInt(yearStr);
-        // Basic sanity check for year (e.g., between 1880 and current year + 1)
+        // Basic sanity check for year (e.g., between 1880 and current year + 2)
         if (releaseYear > 1880 && releaseYear <= new Date().getFullYear() + 2) {
             const decade = Math.floor(releaseYear / 10) * 10;
             const decadeStr = `${decade}s`;
@@ -117,6 +137,10 @@ export const processData = (diary: DiaryEntry[], ratings: RatingEntry[]): Proces
   const topRatedFilms = [...yearRatings]
     .sort((a, b) => parseFloat(b.Rating) - parseFloat(a.Rating))
     .slice(0, 5);
+  
+  // Fallback for first/last film if data is sparse
+  const firstFilm = yearDiary.length > 0 ? yearDiary[yearDiary.length - 1].Name : "N/A";
+  const lastFilm = yearDiary.length > 0 ? yearDiary[0].Name : "N/A";
 
   return {
     year: targetYear,
@@ -134,8 +158,8 @@ export const processData = (diary: DiaryEntry[], ratings: RatingEntry[]): Proces
     topRatedFilms,
     longestStreak: maxStreak,
     busiestDay,
-    firstFilm: yearDiary[yearDiary.length - 1].Name,
-    lastFilm: yearDiary[0].Name,
+    firstFilm,
+    lastFilm,
     uniqueFilmsCount: totalWatched - rewatchCount,
     moviesPerWeekAvg: parseFloat((totalWatched / 52).toFixed(1)),
   };
