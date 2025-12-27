@@ -70,7 +70,7 @@ const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({ data, year, entries }
     fetchSelectedPosters();
   }, [selectedDate, entries, posters]);
 
-  // Smoother Gradient Logic
+  // Drastic, Distinct Color Logic (Hue shifting)
   const getColor = (count: number) => {
     if (count === -1) return 'transparent'; 
     if (count === 0) return '#E0E0E0'; // Muted gray base
@@ -78,12 +78,13 @@ const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({ data, year, entries }
     // Normalized intensity 0 to 1
     const intensity = maxCount > 1 ? count / maxCount : 1;
 
-    // 5-Step Gradient: Yellow -> Orange -> Red -> Purple -> Blue
-    if (intensity <= 0.25) return '#F0C020'; // Yellow
-    if (intensity <= 0.50) return '#F4A020'; // Orange-ish
-    if (intensity <= 0.75) return '#D02020'; // Red
-    if (intensity <= 0.90) return '#703070'; // Purple-ish bridge
-    return '#1040C0'; // Blue
+    // Drastic Hue Shifts: Yellow -> Orange -> Red -> Purple -> Blue
+    // Using solid, distinct colors for maximum "Pop"
+    if (intensity <= 0.15) return '#F0C020'; // Bauhaus Yellow
+    if (intensity <= 0.35) return '#F26522'; // Vibrant Orange
+    if (intensity <= 0.55) return '#D02020'; // Bauhaus Red
+    if (intensity <= 0.80) return '#6D28D9'; // Deep Purple
+    return '#1040C0'; // Bauhaus Blue
   };
 
   const selectedMovies = selectedDate ? entries[selectedDate] : [];
@@ -91,47 +92,66 @@ const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({ data, year, entries }
   return (
     <div className="flex flex-col">
         <div className="w-full overflow-x-auto pb-2 custom-scrollbar">
-        <div className="min-w-[700px]">
-            <div 
-                className="grid gap-[2px]"
-                style={{ 
-                    gridTemplateRows: 'repeat(7, 1fr)', 
-                    gridAutoFlow: 'column',
-                    height: '100px'
-                }}
-            >
-                {days.map((day, idx) => (
-                    <motion.div
-                        key={idx}
-                        onClick={() => day.count >= 0 && setSelectedDate(selectedDate === day.dateStr ? null : day.dateStr)}
-                        initial={{ opacity: 0 }}
-                        whileInView={{ opacity: 1 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: idx * 0.0005 }}
-                        className={`w-3 h-3 cursor-pointer transition-transform ${
-                            day.count >= 0 ? 'hover:scale-125 hover:z-20' : ''
-                        } ${selectedDate === day.dateStr ? 'ring-2 ring-black z-30 scale-125' : ''}`}
-                        style={{ backgroundColor: getColor(day.count) }}
-                        title={day.count >= 0 ? `${day.dateStr}: ${day.count} films` : ''}
-                    />
-                ))}
+            <div className="min-w-[700px]">
+                <div 
+                    className="grid gap-[2px]"
+                    style={{ 
+                        gridTemplateRows: 'repeat(7, 1fr)', 
+                        gridAutoFlow: 'column',
+                        height: '100px'
+                    }}
+                >
+                    {days.map((day, idx) => (
+                        <motion.div
+                            key={idx}
+                            onClick={() => day.count >= 0 && setSelectedDate(selectedDate === day.dateStr ? null : day.dateStr)}
+                            initial={{ opacity: 0 }}
+                            whileInView={{ opacity: 1 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: idx * 0.0005 }}
+                            className={`w-3 h-3 cursor-pointer transition-transform ${
+                                day.count >= 0 ? 'hover:scale-125 hover:z-20' : ''
+                            } ${selectedDate === day.dateStr ? 'ring-2 ring-black z-30 scale-125' : ''}`}
+                            style={{ backgroundColor: getColor(day.count) }}
+                            title={day.count >= 0 ? `${day.dateStr}: ${day.count} films` : ''}
+                        />
+                    ))}
+                </div>
+                
+                {/* Footer: Months and Legend */}
+                <div className="flex flex-col gap-2 mt-2 border-t-2 border-bauhaus-black pt-2">
+                    {/* Month Labels */}
+                    <div className="flex text-[10px] font-black uppercase tracking-widest gap-12 text-gray-400">
+                        <span className="text-black">Jan</span>
+                        <span>Feb</span>
+                        <span>Mar</span>
+                        <span>Apr</span>
+                        <span>May</span>
+                        <span>Jun</span>
+                        <span>Jul</span>
+                        <span>Aug</span>
+                        <span>Sep</span>
+                        <span>Oct</span>
+                        <span>Nov</span>
+                        <span>Dec</span>
+                    </div>
+
+                    {/* Color Key / Legend */}
+                    <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-wider">
+                        <span>Intensity:</span>
+                        <div className="flex items-center gap-1">
+                            <span className="text-gray-400 mr-1">Less</span>
+                            <div className="w-3 h-3 bg-[#E0E0E0] border border-gray-300" title="0 Films"></div>
+                            <div className="w-3 h-3 bg-[#F0C020]" title="Low"></div>
+                            <div className="w-3 h-3 bg-[#F26522]" title="Med-Low"></div>
+                            <div className="w-3 h-3 bg-[#D02020]" title="Medium"></div>
+                            <div className="w-3 h-3 bg-[#6D28D9]" title="Med-High"></div>
+                            <div className="w-3 h-3 bg-[#1040C0]" title="High"></div>
+                            <span className="text-bauhaus-black ml-1">More</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-            {/* Month Labels aligned to grid estimation */}
-            <div className="flex text-[10px] font-black uppercase tracking-widest mt-2 border-t-2 border-bauhaus-black pt-1 gap-12 text-gray-400">
-                <span className="text-black">Jan</span>
-                <span>Feb</span>
-                <span>Mar</span>
-                <span>Apr</span>
-                <span>May</span>
-                <span>Jun</span>
-                <span>Jul</span>
-                <span>Aug</span>
-                <span>Sep</span>
-                <span>Oct</span>
-                <span>Nov</span>
-                <span>Dec</span>
-            </div>
-        </div>
         </div>
 
         {/* Selected Date Details Panel */}
