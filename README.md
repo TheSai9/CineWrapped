@@ -1,7 +1,7 @@
 
 # CineWrapped: Letterboxd Year in Review
 
-<img width="1668" height="661" alt="Screenshot 2025-12-28 102819" src="https://github.com/user-attachments/assets/a9cc21d4-c660-4a25-89b0-9f7946265e60" />
+![CineWrapped Banner](<img width="1668" height="661" alt="image" src="https://github.com/user-attachments/assets/771f9d38-9333-43e5-beca-0780fd95af4a" />)
 
 A cinematic, data-driven storytelling experience that visualizes your Letterboxd movie watching history. Influenced by the "Spotify Wrapped" format and designed with a bold **Bauhaus** aesthetic, this application turns your raw CSV exports into a beautiful, interactive presentation.
 
@@ -20,11 +20,11 @@ A cinematic, data-driven storytelling experience that visualizes your Letterboxd
 
 | Volume Analysis | Rhythm Heatmap |
 |:---:|:---:|
-| <img width="1317" height="676" alt="Screenshot 2025-12-28 102937" src="https://github.com/user-attachments/assets/dd589eab-7b26-4c4b-ac16-fb0a87ed57e2" /> | <img width="1225" height="691" alt="Screenshot 2025-12-28 103024" src="https://github.com/user-attachments/assets/75ef1262-9bc3-4524-afba-d78d3fe62d60" /> |
+| ![Volume Slide](<img width="1317" height="676" alt="image" src="https://github.com/user-attachments/assets/286e6d8a-8eea-4bfd-9d76-5c7954565723" />) | ![Heatmap Slide](<img width="1225" height="691" alt="image" src="https://github.com/user-attachments/assets/b43b4897-aba6-42c7-b341-ee104dca41a0" />) |
 
-| A-List Cast & Crew | Favourite Films |
+| A-List Cast & Crew | Interactive Dropdowns |
 |:---:|:---:|
-| <img width="1356" height="698" alt="Screenshot 2025-12-28 103145" src="https://github.com/user-attachments/assets/c7043ab8-2790-4cbe-b003-d266b1eed9fe" /> | <img width="1361" height="649" alt="Screenshot 2025-12-28 103103" src="https://github.com/user-attachments/assets/d8d68e20-3451-47c9-beb3-3e0b87c7b969" /> |
+| ![Cast Slide](<img width="1356" height="698" alt="image" src="https://github.com/user-attachments/assets/6a09864c-ae60-48ef-a625-00adb363e36e" />) | ![Dropdown UI](<img width="1361" height="649" alt="image" src="https://github.com/user-attachments/assets/e10937a3-2655-433e-81ec-c1c626c0ee8b" />) |
 
 ## 🛠️ Tech Stack
 

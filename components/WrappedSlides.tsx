@@ -4,10 +4,9 @@ import { ProcessedStats, PersonaResult, SimpleMovie, EnrichedItem } from '../typ
 import { BarChart, Bar, XAxis, ResponsiveContainer, Tooltip, Cell, LabelList } from 'recharts';
 import { generatePersona } from '../services/geminiService';
 import { getMoviePoster, streamEnrichedData, EnrichedDataUpdate } from '../services/tmdbService';
-import { ChevronRight, ChevronLeft, RotateCcw, Flame, Trophy, Clock, Star, Film, Users, Clapperboard, Hash, Loader2, Database, ChevronDown, Share2, Download, QrCode } from 'lucide-react';
+import { ChevronRight, ChevronLeft, RotateCcw, Flame, Trophy, Clock, Star, Film, Users, Clapperboard, Hash, Loader2, Database, ChevronDown } from 'lucide-react';
 import CalendarHeatmap from './CalendarHeatmap';
 import MovieListPanel from './MovieListPanel';
-import { toPng } from 'html-to-image';
 
 interface WrappedSlidesProps {
   stats: ProcessedStats;
@@ -630,124 +629,6 @@ const SlideIdentity = React.memo(({ persona, onReset }: { persona: PersonaResult
   </div>
 ));
 
-const SlideShare = React.memo(({ stats, persona, enrichedData }: { stats: ProcessedStats, persona: PersonaResult | null, enrichedData: Omit<EnrichedDataUpdate, 'processedCount' | 'totalCount'> }) => {
-  const cardRef = useRef<HTMLDivElement>(null);
-  const [posterUrl, setPosterUrl] = useState<string | null>(null);
-  const [isDownloading, setIsDownloading] = useState(false);
-
-  useEffect(() => {
-    const fetchTopPoster = async () => {
-      if (stats.topRatedFilms.length > 0) {
-        const topFilm = stats.topRatedFilms[0];
-        const url = await getMoviePoster(topFilm.Name, topFilm.Year);
-        if (url) setPosterUrl(url);
-      }
-    };
-    fetchTopPoster();
-  }, [stats]);
-
-  const handleDownload = async () => {
-    if (!cardRef.current) return;
-    setIsDownloading(true);
-    try {
-      const dataUrl = await toPng(cardRef.current, { cacheBust: true, pixelRatio: 2 });
-      const link = document.createElement('a');
-      link.download = `cinewrapped-${stats.year}.png`;
-      link.href = dataUrl;
-      link.click();
-    } catch (err) {
-      console.error('Failed to export image', err);
-    } finally {
-      setIsDownloading(false);
-    }
-  };
-
-  const topGenre = enrichedData.topGenres[0]?.name || "Film";
-  
-  return (
-    <div className="flex flex-col items-center justify-center min-h-full py-8 px-4 bg-bauhaus-bg">
-      {/* Container for the shareable card */}
-      <div className="mb-8 relative group">
-        <div 
-          ref={cardRef}
-          className="w-[320px] md:w-[375px] h-[600px] md:h-[667px] bg-[#F0F0F0] border-[6px] border-bauhaus-black relative flex flex-col p-6 overflow-hidden shadow-hard-lg"
-        >
-          {/* Background Elements */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-bauhaus-yellow border-l-4 border-b-4 border-bauhaus-black rounded-bl-full"></div>
-          <div className="absolute bottom-0 left-0 w-24 h-24 bg-bauhaus-blue border-t-4 border-r-4 border-bauhaus-black rounded-tr-full"></div>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full opacity-5" style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '10px 10px' }}></div>
-
-          {/* Header */}
-          <div className="relative z-10 mb-4 border-b-4 border-bauhaus-black pb-2 flex justify-between items-end">
-             <div>
-                <h1 className="text-3xl font-black uppercase tracking-tighter leading-none">CINE<br/>WRAPPED</h1>
-             </div>
-             <div className="text-4xl font-black text-bauhaus-red">{stats.year}</div>
-          </div>
-
-          {/* Hero: Top Movie */}
-          <div className="flex-1 flex flex-col items-center justify-center relative z-10 my-2">
-             <div className="relative w-40 h-60 border-4 border-bauhaus-black shadow-[4px_4px_0px_rgba(0,0,0,1)] rotate-2 bg-gray-200">
-                {posterUrl ? (
-                   <img src={posterUrl} crossOrigin="anonymous" alt="Top Film" className="w-full h-full object-cover" />
-                ) : (
-                   <div className="w-full h-full flex items-center justify-center text-gray-400 font-black text-4xl">?</div>
-                )}
-                <div className="absolute -top-4 -right-4 w-12 h-12 bg-bauhaus-red rounded-full border-4 border-bauhaus-black flex items-center justify-center text-white font-black text-lg">
-                   #1
-                </div>
-             </div>
-             <div className="mt-4 text-center">
-                <div className="font-bold uppercase text-xs tracking-widest bg-bauhaus-black text-white px-2 py-1 inline-block mb-1">Top Rated</div>
-                <h2 className="text-xl font-black uppercase leading-tight max-w-[250px]">{stats.topRatedFilms[0]?.Name || "Unknown"}</h2>
-             </div>
-          </div>
-
-          {/* Stats Row */}
-          <div className="grid grid-cols-2 gap-3 relative z-10 mb-6">
-             <div className="bg-white border-4 border-bauhaus-black p-3 text-center">
-                <div className="text-3xl font-black text-bauhaus-blue leading-none">{stats.totalWatched}</div>
-                <div className="text-[10px] font-bold uppercase">Films Watched</div>
-             </div>
-             <div className="bg-white border-4 border-bauhaus-black p-3 text-center">
-                <div className="text-3xl font-black text-bauhaus-red leading-none">{Math.round(stats.totalRuntimeHours / 24)}</div>
-                <div className="text-[10px] font-bold uppercase">Days Spent</div>
-             </div>
-          </div>
-
-          {/* Persona */}
-          <div className="relative z-10 bg-bauhaus-yellow border-4 border-bauhaus-black p-4 text-center mb-4">
-             <div className="text-[10px] font-bold uppercase tracking-widest mb-1">My Cinema Persona</div>
-             <div className="text-xl font-black uppercase leading-none">{persona?.title || "The Mystery Viewer"}</div>
-          </div>
-
-          {/* Footer */}
-          <div className="relative z-10 flex justify-between items-center pt-2 border-t-4 border-bauhaus-black">
-             <div className="flex items-center gap-1">
-                <div className="w-3 h-3 bg-bauhaus-red rounded-full border border-black"></div>
-                <div className="w-3 h-3 bg-bauhaus-blue rounded-full border border-black"></div>
-                <div className="w-3 h-3 bg-bauhaus-yellow rounded-full border border-black"></div>
-             </div>
-             <div className="flex items-center gap-2">
-                 <QrCode size={24} />
-                 <span className="font-bold text-xs uppercase">cinewrapped.app</span>
-             </div>
-          </div>
-        </div>
-      </div>
-
-      <button 
-        onClick={handleDownload}
-        disabled={isDownloading}
-        className="flex items-center gap-2 bg-bauhaus-black text-white px-8 py-4 font-black uppercase tracking-widest hover:bg-bauhaus-red transition-all shadow-hard-md hover:-translate-y-1 active:translate-y-0 active:shadow-none"
-      >
-         {isDownloading ? <Loader2 className="animate-spin" /> : <Download size={20} />}
-         Download Card
-      </button>
-    </div>
-  );
-});
-
 // --- MAIN WRAPPEDSLIDES COMPONENT ---
 
 const WrappedSlides: React.FC<WrappedSlidesProps> = ({ stats, onReset }) => {
@@ -763,7 +644,7 @@ const WrappedSlides: React.FC<WrappedSlidesProps> = ({ stats, onReset }) => {
   });
   const [enrichmentProgress, setEnrichmentProgress] = useState({ processed: 0, total: 0 });
   
-  const totalSlides = 8; // Increased for Share Slide
+  const totalSlides = 7;
 
   useEffect(() => {
     // Generate AI Persona
@@ -842,7 +723,6 @@ const WrappedSlides: React.FC<WrappedSlidesProps> = ({ stats, onReset }) => {
                 {currentSlide === 4 && <SlideFavorites stats={stats} />}
                 {currentSlide === 5 && <SlideCastCrew enrichedData={enrichedData} enrichmentProgress={enrichmentProgress} />}
                 {currentSlide === 6 && <SlideIdentity persona={persona} onReset={onReset} />}
-                {currentSlide === 7 && <SlideShare stats={stats} persona={persona} enrichedData={enrichedData} />}
             </motion.div>
         </AnimatePresence>
       </div>
