@@ -733,81 +733,86 @@ const SlideShare = React.memo(({ stats, persona, enrichedData }: { stats: Proces
              // --- MOBILE LAYOUT ---
              <div className="relative z-10 flex flex-col h-full">
                 {/* Header */}
-                <div className="mb-2 border-b-4 border-bauhaus-black pb-2 flex justify-between items-end shrink-0">
+                <div className="border-b-4 border-bauhaus-black pb-2 flex justify-between items-end shrink-0">
                     <h1 className="text-3xl font-black uppercase tracking-tighter leading-none">CINE<br/>WRAPPED</h1>
                     <div className="text-right">
                          <div className="text-4xl font-black text-bauhaus-red leading-none">{stats.year}</div>
                     </div>
                 </div>
 
-                {/* Hero + Stats Row */}
-                <div className="flex gap-4 mb-4 items-stretch shrink-0 h-48">
-                    {/* Left: #1 Movie */}
-                    <div className="flex-[2] flex flex-col justify-between">
-                         <div className="relative w-full h-36 border-4 border-bauhaus-black shadow-[4px_4px_0px_rgba(0,0,0,1)] rotate-[-2deg] bg-gray-200">
-                            {posters[topFilms[0]?.Name] ? (
-                               <img src={`${posters[topFilms[0]?.Name]}?v=1`} crossOrigin="anonymous" alt="Top Film" className="w-full h-full object-cover" />
-                            ) : (
-                               <div className="w-full h-full flex items-center justify-center text-gray-400 font-black text-4xl">?</div>
-                            )}
-                            <div className="absolute -top-3 -right-3 w-8 h-8 bg-bauhaus-red rounded-full border-2 border-bauhaus-black flex items-center justify-center text-white font-black text-sm">#1</div>
-                         </div>
-                         <div className="text-center w-full px-1 mt-1">
-                             <div className="text-lg font-black uppercase leading-tight truncate">{topFilms[0]?.Name}</div>
-                         </div>
-                    </div>
+                {/* Content Wrapper - Distributes Space Evenly */}
+                <div className="flex-1 flex flex-col justify-between py-4">
 
-                    {/* Right: Stats Stack */}
-                    <div className="flex-1 flex flex-col gap-2 h-full">
-                        <div className="flex-1 bg-bauhaus-black text-white p-2 flex flex-col items-center justify-center shadow-hard-sm border-2 border-transparent">
-                             <span className="text-bauhaus-yellow font-black text-3xl leading-none">{stats.totalWatched}</span>
-                             <span className="text-[10px] font-bold uppercase leading-tight text-center mt-1">Films</span>
-                        </div>
-                        <div className="flex-1 bg-bauhaus-black text-white p-2 flex flex-col items-center justify-center shadow-hard-sm border-2 border-transparent">
-                             <span className="text-bauhaus-blue font-black text-3xl leading-none">{Math.round(stats.totalRuntimeHours)}</span>
-                             <span className="text-[10px] font-bold uppercase leading-tight text-center mt-1">Hours</span>
-                        </div>
-                    </div>
-                </div>
+                  {/* Hero + Stats Row */}
+                  <div className="flex gap-4 items-stretch h-48">
+                      {/* Left: #1 Movie */}
+                      <div className="flex-[2] flex flex-col justify-between">
+                           <div className="relative w-full h-36 border-4 border-bauhaus-black shadow-[4px_4px_0px_rgba(0,0,0,1)] rotate-[-2deg] bg-gray-200">
+                              {posters[topFilms[0]?.Name] ? (
+                                 <img src={`${posters[topFilms[0]?.Name]}?v=1`} crossOrigin="anonymous" alt="Top Film" className="w-full h-full object-cover" />
+                              ) : (
+                                 <div className="w-full h-full flex items-center justify-center text-gray-400 font-black text-4xl">?</div>
+                              )}
+                              <div className="absolute -top-3 -right-3 w-8 h-8 bg-bauhaus-red rounded-full border-2 border-bauhaus-black flex items-center justify-center text-white font-black text-sm">#1</div>
+                           </div>
+                           <div className="text-center w-full px-1 mt-1">
+                               <div className="text-lg font-black uppercase leading-tight truncate">{topFilms[0]?.Name}</div>
+                           </div>
+                      </div>
 
-                {/* Top 5 Grid (Movies 2-5) */}
-                <div className="grid grid-cols-4 gap-2 mb-4 px-2 shrink-0">
-                    {topFilms.slice(1).map((film, idx) => (
-                        <div key={idx} className="flex flex-col items-center">
-                            <div className="w-full aspect-[2/3] border-2 border-bauhaus-black bg-gray-200 relative">
-                                {posters[film.Name] && <img src={`${posters[film.Name]}?v=1`} crossOrigin="anonymous" alt={film.Name} className="w-full h-full object-cover" />}
-                                <div className="absolute top-0 left-0 bg-black text-white text-[8px] font-bold px-1">{idx + 2}</div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                      {/* Right: Stats Stack */}
+                      <div className="flex-1 flex flex-col gap-2 h-full">
+                          <div className="flex-1 bg-bauhaus-black text-white p-2 flex flex-col items-center justify-center shadow-hard-sm border-2 border-transparent">
+                               <span className="text-bauhaus-yellow font-black text-3xl leading-none">{stats.totalWatched}</span>
+                               <span className="text-[10px] font-bold uppercase leading-tight text-center mt-1">Films</span>
+                          </div>
+                          <div className="flex-1 bg-bauhaus-black text-white p-2 flex flex-col items-center justify-center shadow-hard-sm border-2 border-transparent">
+                               <span className="text-bauhaus-blue font-black text-3xl leading-none">{Math.round(stats.totalRuntimeHours)}</span>
+                               <span className="text-[10px] font-bold uppercase leading-tight text-center mt-1">Hours</span>
+                          </div>
+                      </div>
+                  </div>
 
-                {/* Stars Section (Actor/Director) */}
-                <div className="flex justify-between gap-2 mb-4 shrink-0">
-                    {topActor && (
-                        <div className="bg-white border-2 border-black p-2 flex-1 shadow-hard-sm">
-                            <div className="text-[9px] font-bold uppercase text-gray-500">Top Actor</div>
-                            <div className="font-black text-sm uppercase leading-tight truncate">{topActor.name}</div>
-                            <div className="text-[10px] text-bauhaus-blue font-bold">{topActor.count} Films</div>
-                        </div>
-                    )}
-                    {topDirector && (
-                         <div className="bg-white border-2 border-black p-2 flex-1 shadow-hard-sm">
-                            <div className="text-[9px] font-bold uppercase text-gray-500">Top Director</div>
-                            <div className="font-black text-sm uppercase leading-tight truncate">{topDirector.name}</div>
-                            <div className="text-[10px] text-bauhaus-red font-bold">{topDirector.count} Films</div>
-                        </div>
-                    )}
-                </div>
+                  {/* Top 5 Grid (Movies 2-5) */}
+                  <div className="grid grid-cols-4 gap-2 px-2">
+                      {topFilms.slice(1).map((film, idx) => (
+                          <div key={idx} className="flex flex-col items-center">
+                              <div className="w-full aspect-[2/3] border-2 border-bauhaus-black bg-gray-200 relative">
+                                  {posters[film.Name] && <img src={`${posters[film.Name]}?v=1`} crossOrigin="anonymous" alt={film.Name} className="w-full h-full object-cover" />}
+                                  <div className="absolute top-0 left-0 bg-black text-white text-[8px] font-bold px-1">{idx + 2}</div>
+                              </div>
+                          </div>
+                      ))}
+                  </div>
 
-                 {/* Persona */}
-                <div className="bg-bauhaus-yellow border-2 border-bauhaus-black p-3 text-center shadow-hard-sm mt-auto">
-                    <div className="text-[9px] font-bold uppercase tracking-widest mb-1">My Cinema Persona</div>
-                    <div className="text-lg font-black uppercase leading-none">{persona?.title || "The Mystery Viewer"}</div>
+                  {/* Stars Section (Actor/Director) */}
+                  <div className="flex justify-between gap-2">
+                      {topActor && (
+                          <div className="bg-white border-2 border-black p-2 flex-1 shadow-hard-sm">
+                              <div className="text-[9px] font-bold uppercase text-gray-500">Top Actor</div>
+                              <div className="font-black text-sm uppercase leading-tight truncate">{topActor.name}</div>
+                              <div className="text-[10px] text-bauhaus-blue font-bold">{topActor.count} Films</div>
+                          </div>
+                      )}
+                      {topDirector && (
+                           <div className="bg-white border-2 border-black p-2 flex-1 shadow-hard-sm">
+                              <div className="text-[9px] font-bold uppercase text-gray-500">Top Director</div>
+                              <div className="font-black text-sm uppercase leading-tight truncate">{topDirector.name}</div>
+                              <div className="text-[10px] text-bauhaus-red font-bold">{topDirector.count} Films</div>
+                          </div>
+                      )}
+                  </div>
+
+                   {/* Persona */}
+                  <div className="bg-bauhaus-yellow border-2 border-bauhaus-black p-3 text-center shadow-hard-sm">
+                      <div className="text-[9px] font-bold uppercase tracking-widest mb-1">My Cinema Persona</div>
+                      <div className="text-lg font-black uppercase leading-none">{persona?.title || "The Mystery Viewer"}</div>
+                  </div>
+
                 </div>
 
                 {/* Footer */}
-                <div className="flex justify-between items-center pt-2 mt-2 border-t-2 border-bauhaus-black shrink-0">
+                <div className="flex justify-between items-center pt-2 border-t-2 border-bauhaus-black shrink-0">
                      <div className="flex items-center gap-1">
                         <div className="w-2 h-2 bg-bauhaus-red rounded-full border border-black"></div>
                         <div className="w-2 h-2 bg-bauhaus-blue rounded-full border border-black"></div>
@@ -835,7 +840,6 @@ const SlideShare = React.memo(({ stats, persona, enrichedData }: { stats: Proces
                       
                       {/* Boxed Title for #1 Movie - Tighter Box */}
                       <div className="mt-3 mx-1 bg-white border-4 border-bauhaus-black p-3 shadow-hard-md relative">
-                           <div className="absolute -top-3 left-3 bg-bauhaus-black text-white px-2 text-xs font-bold uppercase">Top Film</div>
                            <div className={`${getTitleStyle(topFilms[0]?.Name)} font-black uppercase leading-tight whitespace-nowrap overflow-hidden text-ellipsis`}>{topFilms[0]?.Name}</div>
                            <div className="flex items-center gap-2 mt-1 text-bauhaus-blue">
                                <Star fill="currentColor" size={20} />
@@ -921,7 +925,7 @@ const SlideShare = React.memo(({ stats, persona, enrichedData }: { stats: Proces
 
                            <div className="flex justify-between items-end border-t-4 border-bauhaus-black pt-1">
                                <div className="text-xs font-bold uppercase">Generated by CineWrapped</div>
-                               <div className="flex items-center gap-2">
+                               <div className="flex items-center gap-5">
                                   <QrCode size={24} />
                                   <span className="font-black text-sm uppercase tracking-wider">cinewrapped.app</span>
                                 </div>
