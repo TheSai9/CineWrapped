@@ -174,7 +174,19 @@ export const processData = (diary: DiaryEntry[], ratings: RatingEntry[]): Proces
   });
 
   // 4. Ratings Analysis
-  const yearRatings = ratings.filter(r => r.Date.startsWith(targetYear.toString()));
+  // Improved: Fallback to diary ratings if ratings CSV is not provided
+  let sourceRatings = ratings;
+  if (sourceRatings.length === 0) {
+     sourceRatings = diary.filter(d => d.Rating).map(d => ({
+         Date: d["Watched Date"],
+         Name: d.Name,
+         Year: d.Year,
+         "Letterboxd URI": d["Letterboxd URI"],
+         Rating: d.Rating
+     }));
+  }
+
+  const yearRatings = sourceRatings.filter(r => r.Date.startsWith(targetYear.toString()));
   
   let ratingSum = 0;
   const ratingData: Record<string, { count: number; movies: SimpleMovie[] }> = {};
@@ -202,7 +214,7 @@ export const processData = (diary: DiaryEntry[], ratings: RatingEntry[]): Proces
     .sort((a, b) => parseFloat(a[0]) - parseFloat(b[0]))
     .map(([rating, data]) => ({ 
         rating, 
-        count: data.count,
+        count: data.count, 
         movies: data.movies 
     }));
 
@@ -210,9 +222,19 @@ export const processData = (diary: DiaryEntry[], ratings: RatingEntry[]): Proces
   const rewatchCount = yearDiary.filter(d => d.Rewatch === "Yes").length;
 
   // 6. Top Rated
-  const topRatedFilms = [...yearRatings]
-    .sort((a, b) => parseFloat(b.Rating) - parseFloat(a.Rating))
-    .slice(0, 5);
+  // Logic update: If >5 films are 5 stars, show all. Else top 5.
+  const fiveStarFilms = yearRatings.filter(r => parseFloat(r.Rating) === 5);
+  let topRatedFilms: RatingEntry[] = [];
+
+  if (fiveStarFilms.length > 5) {
+      // If we have more than 5 five-star films, show all of them (sorted alphabetically for stability)
+      topRatedFilms = fiveStarFilms.sort((a, b) => a.Name.localeCompare(b.Name));
+  } else {
+      // Otherwise fallback to top 5 sorted by rating
+      topRatedFilms = [...yearRatings]
+        .sort((a, b) => parseFloat(b.Rating) - parseFloat(a.Rating))
+        .slice(0, 5);
+  }
   
   // Fallback for first/last film
   const firstFilm = yearDiary.length > 0 ? yearDiary[yearDiary.length - 1].Name : "N/A";

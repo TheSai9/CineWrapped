@@ -1,4 +1,3 @@
-
 import React, { useMemo, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DailyEntryDetail } from '../types';
@@ -24,7 +23,7 @@ const CalendarHeatmap: React.FC<CalendarHeatmapProps> = ({ data, year, entries }
   const { days } = useMemo(() => {
     const startDate = new Date(year, 0, 1);
     const endDate = new Date(year, 11, 31);
-    const dayMap = new Map(data.map(d => [d.date, d.count]));
+    const dayMap = new Map<string, number>(data.map(d => [d.date, d.count]));
     
     const daysArr: { date: Date; count: number; dateStr: string }[] = [];
     const currentDate = new Date(startDate);
